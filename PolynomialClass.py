@@ -1,67 +1,56 @@
 class Polynomial:
-    """
-    Polynomial Class:
-    argument list: [a0, a1, a2, a3, a4, ..., an]
-    which represents a0 + a1x^1 + a2x^2 + ... + anx^n
-    """
-
-    def __init__(self, *coefficients):
-        if len(coefficients) == 0:
-            self.coefficients = [0]
+    def __init__(self, *coeffs):
+        if not coeffs:
+            self.coeffs = [0]
         else:
-            self.coefficients = coefficients
+            self.coeffs = coeffs
 
     def __call__(self, x):
         result = 0
-        power = 1
-        for coef in self.coefficients:
-            result += coef * power
-            power *= x
+        for i, coeff in enumerate(self.coeffs):
+            result += coeff * (x ** i)
         return result
 
     def dim(self):
-        return len(self.coefficients) - 1
+        return len(self.coeffs) - 1
 
     def __add__(self, other):
-        if isinstance(other, Polynomial):
-            new_coef = [0] * max(len(self.coefficients), len(other.coefficients))
-            for i in range(len(new_coef)):
-                if i < len(self.coefficients):
-                    new_coef[i] += self.coefficients[i]
-                if i < len(other.coefficients):
-                    new_coef[i] += other.coefficients[i]
-            return Polynomial(*new_coef)
-        else:
-            raise TypeError("unsupported operand type(s) for +: 'Polynomial' and '{}'".format(type(other).__name__))
+        combined_coeffs = []
+        max_len = max(len(self.coeffs), len(other.coeffs))
+        for i in range(max_len):
+            c1 = self.coeffs[i] if i < len(self.coeffs) else 0
+            c2 = other.coeffs[i] if i < len(other.coeffs) else 0
+            combined_coeffs.append(c1 + c2)
+        return Polynomial(*combined_coeffs)
 
     def __sub__(self, other):
-        if isinstance(other, Polynomial):
-            new_coef = [0] * max(len(self.coefficients), len(other.coefficients))
-            for i in range(len(new_coef)):
-                if i < len(self.coefficients):
-                    new_coef[i] += self.coefficients[i]
-                if i < len(other.coefficients):
-                    new_coef[i] -= other.coefficients[i]
-            return Polynomial(*new_coef)
-        else:
-            raise TypeError("unsupported operand type(s) for -: 'Polynomial' and '{}'".format(type(other).__name__))
+        combined_coeffs = []
+        max_len = max(len(self.coeffs), len(other.coeffs))
+        for i in range(max_len):
+            c1 = self.coeffs[i] if i < len(self.coeffs) else 0
+            c2 = other.coeffs[i] if i < len(other.coeffs) else 0
+            combined_coeffs.append(c1 - c2)
+        return Polynomial(*combined_coeffs)
 
     def __str__(self):
         terms = []
-        for i, coef in enumerate(self.coefficients):
-            if coef == 0:
-                continue
-            if i == 0:
-                term = str(coef)
-            elif i == 1:
-                term = "{}x".format(coef) if coef != 1 else "x"
-            else:
-                term = "{}x^{}".format(coef, i)
-            terms.append(term)
-        if len(terms) == 0:
+        for i, coeff in enumerate(self.coeffs):
+            if coeff != 0:
+                if i == 0:
+                    terms.append(str(coeff))
+                elif i == 1:
+                    terms.append(f"{coeff}x")
+                else:
+                    terms.append(f"{coeff}x^{i}")
+        if not terms:
             return "0"
         else:
-            return " + ".join(terms)
+            return " + ".join(reversed(terms))
 
     def __repr__(self):
-        return "Polynomial({})".format(", ".join(str(coef) for coef in self.coefficients))
+        return f"Polynomial{tuple(self.coeffs)}"
+        
+    __doc__ = "Polynomial Class:\n" + \
+              "  argument list: [a0, a1, a2, a3, ..., an]\n" + \
+              "                 which represents\n" + \
+              "                 a0 + a1x^1 + a2x^2 + ... + anx^n"
